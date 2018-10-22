@@ -1,13 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../../models/User");
-
 const gravatar = require("gravatar");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const keys = require("../../config/keys");
 const passport = require("passport");
 
+const validateRegisterInput = require("../../validation/register");
+const validateLoginInput = require("../../validation/login");
 // @route GET api/users
 // @desc Get test
 // @access Public
@@ -17,6 +18,9 @@ router.get("/test", (req, res) => res.json({ msg: "users.js works" }));
 // @desc Post a new user
 // @access Public
 router.post("/register", (req, res) => {
+  const { errors, isValid } = validateRegisterInput(req.body);
+  if (!isValid) return res.status(400).json(errors);
+  // register 규칙을 만족시키지 못했다면 (isValid === false) 400 응답과 errors 객체의 내용을 보여준다
   User.findOne({ email: req.body.email }).then(user => {
     //findOne의 결과
     if (user) {
@@ -53,13 +57,20 @@ router.post("/register", (req, res) => {
 // @desc Post user login info. / Return token (JWT)
 // @access Public
 router.post("/login", (req, res) => {
+  const { errors, isValid } = validateLoginInput(req.body);
+  if (!isValid) {
+    return res.status(400).json(errors);
+  }
   const email = req.body.email;
   const password = req.body.password;
 
   User.findOne({ email: email }) // 생략 가능 -> email
     .then(user => {
       // 검색 결과 user인자를 받아서
-      if (!user) res.status(404).json({ email: "user not found" });
+      if (!user) {
+        errors.email = "User not found";
+        res.status(404).json(errors);
+      }
       bcrypt.compare(password, user.password).then(isMatch => {
         if (isMatch) {
           // 정상 로그인 시도
@@ -82,7 +93,10 @@ router.post("/login", (req, res) => {
               });
             }
           );
-        } else return res.status(400).json({ password: "password incorrect" });
+        } else {
+          errors.password = "Password incorrect";
+          return res.status(400).json(errors);
+        }
       });
     });
 });
