@@ -110,7 +110,8 @@ router.get(
   (req, res) => {
     // res.json({ msg: "success" });
     res.json({
-      id: req.user.id,
+      req: req.user,
+      id: req.user.id, // logged in User, Token으로부터 알 수 있다
       name: req.user.name,
       email: req.user.email
     });

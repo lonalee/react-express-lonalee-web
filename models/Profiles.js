@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const ProfileSchema = new Schema({
-  user: { type: Schema.Types.ObjectId, ref: "users" },
+  user: { type: Schema.Types.ObjectId, ref: "user" },
   handle: { type: String, required: true, max: 40 },
   company: { type: String },
   website: { type: String },
@@ -34,11 +34,11 @@ const ProfileSchema = new Schema({
     }
   ],
   social: {
-    youtube: { type: String, required: true },
-    twitter: { type: String, required: true },
-    facebook: { type: String, required: true },
-    instagram: { type: String, required: true },
-    linkedin: { type: String, required: true }
+    youtube: { type: String },
+    twitter: { type: String },
+    facebook: { type: String },
+    instagram: { type: String },
+    linkedin: { type: String }
   },
   date: { type: Date, default: Date.now }
 });
