@@ -2,10 +2,13 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const passport = require("passport");
+
+// routes
 const users = require("./routes/api/users");
 const profiles = require("./routes/api/profiles");
 const posts = require("./routes/api/posts");
-
+const items = require("./routes/api/items");
+//
 const app = express();
 
 // body-parser
@@ -19,6 +22,9 @@ require("./config/passport")(passport);
 app.use("/api/users", users);
 app.use("/api/profiles", profiles);
 app.use("/api/posts", posts);
+app.use("/api/items", items);
+
+//
 
 const port = process.env.PORT || 5200;
 // process.env.PORT for deploy to HEROKU
