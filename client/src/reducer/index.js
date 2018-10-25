@@ -1,5 +1,4 @@
 // root reducer
-// 하위 reducer들을 한 곳에 모으는 역할
 
 import { combineReducers } from "redux";
 import authReducer from "./authReducer";

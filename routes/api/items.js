@@ -17,14 +17,19 @@ router.get("/", (req, res) => {
 // @desc Create An Item
 // @access Public
 router.post("/", (req, res) => {
-  const newItem = new Item({ userid: req.body.id, name: req.body.name });
+  // split req.body.content with '\n' into an array
+  const newItem = new Item({
+    userid: req.body.id,
+    content: req.body.content,
+    heading: req.body.heading
+  });
   newItem.save().then(item => res.json(item));
 });
 // @route DELETE api/items/:id
 // @desc DELETE An Item
 // @access Public
 router.delete("/:id", (req, res) => {
-  Item.findOne({ name: req.params.id })
+  Item.findOne({ userid: req.params.id })
     .then(item => item.remove().then(() => res.json({ success: true })))
     .catch(err => res.status(404).json({ success: false }));
 });

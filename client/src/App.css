@@ -1,3 +1,27 @@
+/* Text Area */
+.form-text-area {
+  margin-bottom: 60px;
+}
+.text-area {
+  height: 150px;
+  display: block;
+  width: 50%;
+}
+
+/* container in the list */
+.list-Container {
+  margin-top: 70px;
+}
+
+.list-group-item-heading {
+  display: inline-block;
+  border: 1px solid crimson;
+  padding: 10px;
+}
+.list-group-item-text {
+  margin-left: 47px;
+}
+/*  */
 img {
   width: 100%;
 }

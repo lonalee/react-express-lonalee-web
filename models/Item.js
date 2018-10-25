@@ -4,7 +4,8 @@ const Schema = mongoose.Schema;
 
 const ItemSchema = new Schema({
   userid: { type: String },
-  name: { type: String, required: true },
+  content: { type: [String], required: true },
+  heading: { type: String },
   date: { type: Date, default: Date.now }
 });
 

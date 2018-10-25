@@ -13,7 +13,7 @@ import { Link } from "react-router-dom";
 class Navbar extends Component {
   render() {
     return (
-      <nav className="navbar navbar-expand-sm navbar-dark bg-dark mb-4">
+      <nav className="navbar navbar-expand-sm navbar-light bg-light mb-4 fixed-top">
         <div className="container">
           <Link className="navbar-brand" to="/">
             DevConnector
