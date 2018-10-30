@@ -15,27 +15,25 @@ import uuid from "uuid";
 import Axios from "axios";
 
 class ShoppingList extends Component {
-  // state = {
-  //   items: [
-  //           { id: uuid(), name: 'Eggs'},
-  //           { id: uuid(), name: 'Milk'},
-  //           { id: uuid(), name: 'Steak'},
-  //           { id: uuid(), name: 'Water'}
-  //          ]};
-  state = {
-    items: [{ userid: uuid(), content: [], heading: "" }],
-    content: ""
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      items: [{ userid: uuid(), content: [], heading: "" }],
+      content: "",
+      isFetched: false
+    };
+  }
 
   // component 로드 직후 DB에서 데이터를 수신해서 표시
-  // componentDidMount() {
-  //   fetch("/api/items")
-  //     .then(res => res.json()) // promise instance responded 그래서 한번 더 then.
-  //     .then(item => {
-  //       this.setState({ items: [...this.state.items, ...item] });
-  //       console.log(item.length + " items have fetched");
-  //     });
-  // }
+  componentDidMount() {
+    // fetch("/api/items")
+    //   .then(res => res.json()) // promise instance responded 그래서 한번 더 then.
+    //   .then(item => {
+    //     this.setState({ items: [...item] });
+    //     console.log(item.length + " items have fetched");
+    //   });
+  }
+
   // When FETCH button clicked
   fetchAll = () => {
     Axios.get("/api/items")
@@ -46,6 +44,9 @@ class ShoppingList extends Component {
         console.log(this.state);
       })
       .catch(err => console.log(err.response.data));
+    this.setState({
+      isFetched: !this.state.isFetched
+    });
   };
   // addItem for AJAX request
   addItem = () => {
@@ -57,10 +58,14 @@ class ShoppingList extends Component {
         content: this.state.content
       };
       newItem.content = newItem.content.split("\n");
-      // console.log(newItem.content);
+      console.log(newItem);
+      this.setState({
+        items: [newItem, ...this.state.items]
+      });
+      console.log(this.state.items);
       Axios.post("/api/items", newItem)
         .then(res => {
-          this.setState({ items: [newItem, ...this.state.items] }); // 시점 변경 필요
+          console.log(res.response.data); // 시점 변경 필요
         })
         .catch(err => console.log(err.response.data));
     }
@@ -113,7 +118,7 @@ class ShoppingList extends Component {
           <Form className="form-text-area">
             <Label>Any comments?</Label>
             <textarea
-              tabIndex="0"
+              // tabIndex="0"
               className="text-area"
               value={this.state.content}
               onChange={this.onChange}
@@ -157,61 +162,77 @@ class ShoppingList extends Component {
         >
           FETCH from myDB
         </Button>
-        <ListGroup>
-          <TransitionGroup className="shopping-list">
-            {items.map(
-              ({ userid, content, heading }) =>
-                userid !== "undefined" && (
-                  <CSSTransition key={userid} timeout={500} classNames="fade">
-                    <ListGroupItem key={userid}>
-                      {/* ListGroup => ul ListGroupItem => li */}
-                      <Button
-                        key={userid}
-                        className="remove-btn"
-                        color="danger"
-                        size="sm"
-                        onClick={() => {
-                          // this.state.items.forEach(item =>
-                          //   console.log(
-                          //     "item.id =",
-                          //     item.userid,
-                          //     "id =",
-                          //     userid
-                          //   )
-                          // );
-                          this.setState(state => ({
-                            items: state.items.filter(
-                              item => item.userid !== userid
-                            )
-                          }));
-                          // map 과정에서 모든 요소들의 key 프로퍼티에 items의 id가 할당되었다
-                          // filter iteration에서 state.items의 id와 클릭된 아이템의 id를 비교해서 조건식을 만족하지 못하면 filter한다. iteration 밖에서는 참조할 수 없다
-                          this.delItem(userid);
-                        }}
-                      >
-                        &times;
-                      </Button>
-                      {Object.values(content).length === 0 &&
-                        "FETCH or Add Item"}
-                      <ListGroupItemHeading>{heading}</ListGroupItemHeading>
-                      <ListGroupItemText>
-                        {Object.values(content).length === 1 && content}
-                      </ListGroupItemText>
+        {/* {this.state.items.length === 0 && "FETCH or Add Item"} */}
+        {this.state.isFetched ? (
+          <ListGroup>
+            <TransitionGroup className="shopping-list">
+              {items.map(
+                ({ userid, content, heading }) =>
+                  userid !== "undefined" && (
+                    <CSSTransition key={userid} timeout={500} classNames="fade">
+                      <ListGroupItem key={userid}>
+                        {/* ListGroup => ul ListGroupItem => li */}
+                        <Button
+                          key={userid}
+                          className="remove-btn"
+                          color="danger"
+                          size="sm"
+                          onClick={() => {
+                            // this.state.items.forEach(item =>
+                            //   console.log(
+                            //     "item.id =",
+                            //     item.userid,
+                            //     "id =",
+                            //     userid
+                            //   )
+                            // );
+                            this.setState(state => ({
+                              items: state.items.filter(
+                                item => item.userid !== userid
+                              )
+                            }));
+                            // map 과정에서 모든 요소들의 key 프로퍼티에 items의 id가 할당되었다
+                            // filter iteration에서 state.items의 id와 클릭된 아이템의 id를 비교해서 조건식을 만족하지 못하면 filter한다. iteration 밖에서는 참조할 수 없다
+                            this.delItem(userid);
+                          }}
+                        >
+                          &times;
+                        </Button>
+                        <ListGroupItemHeading>{heading}</ListGroupItemHeading>
+                        <ListGroupItemText>
+                          {Object.values(content).length === 1 && content}
+                        </ListGroupItemText>
 
-                      {/*  (console.log("TEST", Object.values(content).length),
+                        {/*  (console.log("TEST", Object.values(content).length),
                          typeof content) */}
-                      {typeof content !== "string" &&
-                        Object.values(content).length > 1 &&
-                        Object.values(content).map(t => (
-                          <ListGroupItemText>{t}</ListGroupItemText>
-                        ))}
-                      {/* content는 객체화 되어 있어서 직접 map을 실행할 수 없다 */}
-                    </ListGroupItem>
-                  </CSSTransition>
-                )
-            )}
-          </TransitionGroup>
-        </ListGroup>
+                        {typeof content !== "string" &&
+                          Object.values(content).length > 1 &&
+                          Object.values(content).map(t => (
+                            <ListGroupItemText>{t}</ListGroupItemText>
+                          ))}
+                        {/* content는 객체화 되어 있어서 직접 map을 실행할 수 없다 */}
+                      </ListGroupItem>
+                    </CSSTransition>
+                  )
+              )}
+            </TransitionGroup>
+          </ListGroup>
+        ) : (
+          <p
+            style={{
+              fontSize: "2.5rem",
+              textAlign: "center",
+              marginTop: "60px"
+            }}
+          >
+            You may want to Fetch Data from database.
+          </p>
+        )}
+        <div>
+          {this.state.items.map(item => (
+            <textarea value={this.state.content} onChange={this.onChange} />
+          ))}
+        </div>
       </Container>
     );
   }

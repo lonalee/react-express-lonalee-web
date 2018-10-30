@@ -7,10 +7,12 @@ import Navbar from "./components/layout/Navbar";
 import Landing from "./components/layout/Landing";
 import Footer from "./components/layout/Footer";
 
+import Profile from "./components/profile/Profile";
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
 import ShoppingList from "./components/list/ShoppingList";
 import "./App.css";
+import "./queries.css";
 
 class App extends Component {
   render() {
@@ -22,6 +24,7 @@ class App extends Component {
             {/* <Landing /> */}
             <Route exact path="/" component={Landing} />
             <div className="container">
+              <Route exact path="/Profile" component={Profile} />
               <Route exact path="/Login" component={Login} />
               <Route exact path="/Register" component={Register} />
               <Route exact path="/ShoppingList" component={ShoppingList} />

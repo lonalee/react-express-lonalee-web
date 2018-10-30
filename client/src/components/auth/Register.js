@@ -1,6 +1,9 @@
 import React, { Component } from "react";
-import Axios from "axios";
 import classnames from "classnames";
+import { connect } from "react-redux";
+import { registerUser } from "../../action/authActions";
+import PropTypes from "prop-types";
+import { withRouter } from "react-router-dom";
 
 class Register extends Component {
   constructor() {
@@ -15,6 +18,15 @@ class Register extends Component {
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
   }
+  // 응답으로 error를 받으면 errors props가 추가 생성되고 이것을 component state에 반영하자
+  componentWillReceiveProps = nextProps => {
+    if (nextProps.errors) {
+      this.setState({
+        errors: nextProps.errors
+      });
+    }
+  };
+
   onChange(e) {
     this.setState({
       [e.target.name]: e.target.value // e.target.name을 배열에? 배열이 아니라 그냥 구분자이다
@@ -28,19 +40,22 @@ class Register extends Component {
       password: this.state.password,
       password2: this.state.password2
     };
-    Axios.post("/api/users/register", newUser)
-      .then(res => console.log(res.data))
-      // .catch(err => console.log(err.response.data));
-      .catch(err => this.setState({ errors: err.response.data }));
+
+    this.props.registerUser(newUser, this.props.history);
   }
   render() {
     const { errors } = this.state;
     // 위와 동치 const errors = this.state.errors;
+    // const user = this.props.auth.user;
+    // mapPropstoState 메소드로 인해서 접근 가능
+    // 참고. DESTRUCTURING => { user } = this.props.auth
 
+    console.log("props", this.props);
+    console.log("state", this.state);
     return (
       <div>
         <div className="register">
-          <div className="container">
+          <div className="container page-container">
             <div className="row">
               <div className="col-md-8 m-auto">
                 <h1 className="display-4 text-center">Sign Up</h1>
@@ -130,5 +145,26 @@ class Register extends Component {
     );
   }
 }
+// ???
+Register.propTypes = {
+  registerUser: PropTypes.func.isRequired,
+  auth: PropTypes.object.isRequired,
+  errors: PropTypes.object.isRequired
+};
 
-export default Register;
+// PROPS < == > STATE OF STORE
+const mapStatetoProps = state => ({
+  // 이 함수가 이 컴퍼넌트의 props와 state의 프로퍼티를 매핑
+  auth: state.auth, // state.auth는 루트 리듀서의 auth 프로퍼티를 지칭
+  errors: state.errors // 에러발생시 컴퍼넌트의 errors props(새로이 생성)와 errors state 매핑
+  //props가 새롭게 생성될 때 메소드 호출 => componentwillreceiveprops
+});
+
+// get a COMPONENT connected to STORE
+export default connect(
+  mapStatetoProps,
+  // 해당 메소드를 인자로 전달하면 전체 store의 상태(state)에
+  // auth 프로퍼티가 정의되면서 root reducer의 auth프로퍼티를 할당(매핑, store의 state와 컴퍼넌트의 프로퍼티)하게 된다.
+  // null,
+  { registerUser }
+)(withRouter(Register));

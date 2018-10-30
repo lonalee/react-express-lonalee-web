@@ -9,14 +9,14 @@ class Landing extends Component {
           <div className="container">
             <div className="row">
               <div className="col-md-12 text-center">
-                <h1 className="display-3 mb-4">Developer Connector</h1>
+                <h1 className="display-3">Stay Connected</h1>
                 <p className="lead">
                   {" "}
                   Create a developer profile/portfolio, share posts and get help
                   from other developers
                 </p>
-                <hr />
-                <Link to="/register" className="btn btn-lg btn-info mr-2">
+
+                <Link to="/register" className="landing-btn btn btn-lg mr-2">
                   Sign Up
                 </Link>
                 {/* a 태그는 link 태그로 바뀌어야 한다, (in React, router 적용 후) */}
