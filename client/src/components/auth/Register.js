@@ -18,6 +18,12 @@ class Register extends Component {
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
   }
+
+  // 컴퍼넌트가 로딩되면 로그인 여부를 확인해서 login 컴퍼넌트로의 access를 dashboard로 redirecting
+  componentDidMount() {
+    if (this.props.auth.isAuthenticated) this.props.history.push("/dashboard");
+  }
+
   // 응답으로 error를 받으면 errors props가 추가 생성되고 이것을 component state에 반영하자
   componentWillReceiveProps = nextProps => {
     if (nextProps.errors) {
@@ -42,6 +48,7 @@ class Register extends Component {
     };
 
     this.props.registerUser(newUser, this.props.history);
+    // authAction의 registerUser 호출
   }
   render() {
     const { errors } = this.state;

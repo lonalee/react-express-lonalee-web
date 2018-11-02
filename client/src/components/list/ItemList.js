@@ -12,9 +12,13 @@ import {
 } from "reactstrap";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 import uuid from "uuid";
-import Axios from "axios";
 
-class ShoppingList extends Component {
+import { postItem } from "../../action/itemActions";
+import { fetchItem } from "../../action/itemActions";
+import { connect } from "react-redux";
+import PropTypes from "prop-types";
+
+class ItemList extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -25,29 +29,34 @@ class ShoppingList extends Component {
   }
 
   // component 로드 직후 DB에서 데이터를 수신해서 표시
-  componentDidMount() {
-    // fetch("/api/items")
-    //   .then(res => res.json()) // promise instance responded 그래서 한번 더 then.
-    //   .then(item => {
-    //     this.setState({ items: [...item] });
-    //     console.log(item.length + " items have fetched");
-    //   });
+  // componentDidMount() {
+  //   // fetch("/api/items")
+  //   //   .then(res => res.json()) // promise instance responded 그래서 한번 더 then.
+  //   //   .then(item => {
+  //   //     this.setState({ items: [...item] });
+  //   //     console.log(item.length + " items have fetched");
+  //   //   });
+  //   console.log(this.state);
+  // }
+  componentWillReceiveProps(nextProps) {
+    if (nextProps) {
+      console.log("nextProps", nextProps);
+      this.setState({
+        isFetched: nextProps.items.isFetched,
+        items: nextProps.items.fetchedData
+      });
+      console.log("this.state", this.state);
+    }
   }
 
   // When FETCH button clicked
   fetchAll = () => {
-    Axios.get("/api/items")
-      .then(res => {
-        this.setState({
-          items: res.data
-        });
-        console.log(this.state);
-      })
-      .catch(err => console.log(err.response.data));
-    this.setState({
-      isFetched: !this.state.isFetched
-    });
+    this.props.fetchItem();
+    // fetchItem();
+    console.log(this.props);
+    console.log(this.state);
   };
+
   // addItem for AJAX request
   addItem = () => {
     const heading = prompt("Enter Heading");
@@ -63,11 +72,7 @@ class ShoppingList extends Component {
         items: [newItem, ...this.state.items]
       });
       console.log(this.state.items);
-      Axios.post("/api/items", newItem)
-        .then(res => {
-          console.log(res.response.data); // 시점 변경 필요
-        })
-        .catch(err => console.log(err.response.data));
+      postItem(newItem);
     }
     this.setState({ content: "" });
   };
@@ -111,6 +116,8 @@ class ShoppingList extends Component {
   };
   render() {
     const { items } = this.state;
+
+    console.log(items);
     // 밑에서 items.map 수행 === this.state.items.map
     return (
       <Container className="list-Container">
@@ -123,6 +130,7 @@ class ShoppingList extends Component {
               value={this.state.content}
               onChange={this.onChange}
             />
+            <input type="date" />
           </Form>
         </FormGroup>
         <Button
@@ -174,7 +182,7 @@ class ShoppingList extends Component {
                         {/* ListGroup => ul ListGroupItem => li */}
                         <Button
                           key={userid}
-                          className="remove-btn"
+                          className="remove-btn rounded-circle"
                           color="danger"
                           size="sm"
                           onClick={() => {
@@ -228,14 +236,26 @@ class ShoppingList extends Component {
             You may want to Fetch Data from database.
           </p>
         )}
-        <div>
+        {/* <div>
           {this.state.items.map(item => (
             <textarea value={this.state.content} onChange={this.onChange} />
           ))}
-        </div>
+        </div> */}
       </Container>
     );
   }
 }
 
-export default ShoppingList;
+ItemList.propTypes = {
+  items: PropTypes.object.isRequired,
+  fetchItem: PropTypes.func.isRequired
+};
+
+const mapStatetoProps = state => ({
+  items: state.items
+});
+
+export default connect(
+  mapStatetoProps,
+  { fetchItem }
+)(ItemList);
