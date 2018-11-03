@@ -144,3 +144,18 @@ section h2 {
 .page-container {
   margin-top: 80px;
 }
+
+/* CHK BOX */
+input[id="cb1"] + label {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #bcbcbc;
+  cursor: pointer;
+}
+input[id="cb1"]:checked + label {
+  background-color: #da1818;
+}
+input[id="cb1"] {
+  display: none;
+}

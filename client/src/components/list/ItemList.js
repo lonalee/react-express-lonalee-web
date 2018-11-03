@@ -23,29 +23,33 @@ class ItemList extends Component {
     super(props);
     this.state = {
       items: [{ userid: uuid(), content: [], heading: "" }],
-      content: "",
+      content: "", // input value를 위한 임시 프로퍼티
       isFetched: false
     };
   }
 
-  // component 로드 직후 DB에서 데이터를 수신해서 표시
-  // componentDidMount() {
-  //   // fetch("/api/items")
-  //   //   .then(res => res.json()) // promise instance responded 그래서 한번 더 then.
-  //   //   .then(item => {
-  //   //     this.setState({ items: [...item] });
-  //   //     console.log(item.length + " items have fetched");
-  //   //   });
-  //   console.log(this.state);
-  // }
+  componentDidMount() {
+    console.log("this.props", this.props);
+    this.setState({
+      isFetched: this.props.items.isFetched,
+      items: this.props.items.fetchedData
+    });
+  }
   componentWillReceiveProps(nextProps) {
     if (nextProps) {
-      console.log("nextProps", nextProps);
+      console.log("nextProps", nextProps.items.fetchedData);
       this.setState({
         isFetched: nextProps.items.isFetched,
-        items: nextProps.items.fetchedData
+        items: [...nextProps.items.fetchedData]
       });
       console.log("this.state", this.state);
+    }
+    if (nextProps.items.isAdded) {
+      console.log("is_Added", nextProps);
+      this.setState({
+        items: [nextProps.items.addedData, ...this.state.items]
+      });
+      nextProps.items.addedData = "";
     }
   }
 
@@ -67,12 +71,7 @@ class ItemList extends Component {
         content: this.state.content
       };
       newItem.content = newItem.content.split("\n");
-      console.log(newItem);
-      this.setState({
-        items: [newItem, ...this.state.items]
-      });
-      console.log(this.state.items);
-      postItem(newItem);
+      this.props.postItem(newItem);
     }
     this.setState({ content: "" });
   };
@@ -115,10 +114,8 @@ class ItemList extends Component {
     this.setState({ content: e.target.value }); // 일시적으로 입력되는 값을 저장
   };
   render() {
-    const { items } = this.state;
-
+    const { items } = this.state; // 객체 deStructuring
     console.log(items);
-    // 밑에서 items.map 수행 === this.state.items.map
     return (
       <Container className="list-Container">
         <FormGroup>
@@ -146,12 +143,9 @@ class ItemList extends Component {
           style={{ marginBottom: "2rem" }}
           onClick={() => {
             const yes = prompt("Are you sure you want to Delete All?");
-            // alert 창으로 표시되어서 입력값을 name 변수에 할당
             if (yes) {
               this.setState({
                 items: [{ id: uuid(), name: "***Example***" }]
-                // 각 객체들을 items 배열에 spread하고 맨 뒤에 새로운 객체를 추가한다
-                // name 프로퍼티와 파라미터로 받은 name이 동일하기 때문에 name으로 축약 표현 가능
               });
               this.delAll();
             }
@@ -171,7 +165,7 @@ class ItemList extends Component {
           FETCH from myDB
         </Button>
         {/* {this.state.items.length === 0 && "FETCH or Add Item"} */}
-        {this.state.isFetched ? (
+        {this.props.items.isFetched ? (
           <ListGroup>
             <TransitionGroup className="shopping-list">
               {items.map(
@@ -206,6 +200,10 @@ class ItemList extends Component {
                         >
                           &times;
                         </Button>
+                        <div className="radio-box">
+                          <input type="checkbox" id="cb1" />
+                          <label for="cb1" />
+                        </div>
                         <ListGroupItemHeading>{heading}</ListGroupItemHeading>
                         <ListGroupItemText>
                           {Object.values(content).length === 1 && content}
@@ -248,7 +246,8 @@ class ItemList extends Component {
 
 ItemList.propTypes = {
   items: PropTypes.object.isRequired,
-  fetchItem: PropTypes.func.isRequired
+  fetchItem: PropTypes.func.isRequired,
+  postItem: PropTypes.func.isRequired
 };
 
 const mapStatetoProps = state => ({
@@ -257,5 +256,5 @@ const mapStatetoProps = state => ({
 
 export default connect(
   mapStatetoProps,
-  { fetchItem }
+  { fetchItem, postItem }
 )(ItemList);

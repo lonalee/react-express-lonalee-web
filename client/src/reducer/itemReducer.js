@@ -1,8 +1,11 @@
 import { IS_FETCHED } from "../action/types";
+import { IS_ADDED } from "../action/types";
 
 const initialState = {
   isFetched: false,
-  fetchedData: []
+  isAdded: false,
+  fetchedData: [],
+  addedData: {}
 };
 
 export default function(state = initialState, action) {
@@ -12,6 +15,12 @@ export default function(state = initialState, action) {
         ...state,
         isFetched: !state.isFetched,
         fetchedData: action.payload
+      };
+    case IS_ADDED:
+      return {
+        ...state,
+        isAdded: !state.isAdded,
+        addedData: action.payload
       };
     default:
       return state;
