@@ -22,9 +22,19 @@ class ItemList extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      items: [{ userid: uuid(), content: [], heading: "" }],
+      items: [
+        {
+          userid: uuid(),
+          content: [],
+          heading: "",
+          isChecked: false,
+          isUpdated: false
+        }
+      ],
       content: "", // input value를 위한 임시 프로퍼티
-      isFetched: false
+      isFetched: false,
+      checkedNow: false,
+      update: ""
     };
   }
 
@@ -34,6 +44,7 @@ class ItemList extends Component {
       isFetched: this.props.items.isFetched,
       items: this.props.items.fetchedData
     });
+    console.log("componentDidMount", this.state);
   }
   componentWillReceiveProps(nextProps) {
     if (nextProps) {
@@ -42,7 +53,7 @@ class ItemList extends Component {
         isFetched: nextProps.items.isFetched,
         items: [...nextProps.items.fetchedData]
       });
-      console.log("this.state", this.state);
+      console.log("componentWillReceiveProps", this.state);
     }
     if (nextProps.items.isAdded) {
       console.log("is_Added", nextProps);
@@ -58,7 +69,7 @@ class ItemList extends Component {
     this.props.fetchItem();
     // fetchItem();
     console.log(this.props);
-    console.log(this.state);
+    console.log("fetchAll", this.state);
   };
 
   // addItem for AJAX request
@@ -109,13 +120,64 @@ class ItemList extends Component {
   };
 
   // *** TODO *** updateItem Method
-
   onChange = e => {
     this.setState({ content: e.target.value }); // 일시적으로 입력되는 값을 저장
   };
+  update = e => {
+    // console.dir(e.target);
+    console.log("value", e.target.value);
+
+    this.setState({ update: e.target.value });
+    console.log("update", this.state.update);
+    // e.target.value = this.state.update;
+  };
+  chkBtn(e) {
+    console.log("e.target.id", e.target.id);
+    this.props.items.fetchedData = this.props.items.fetchedData.map(item => {
+      return e.target.id === item.userid
+        ? { ...item, isChecked: !item.isChecked }
+        : item;
+      // if (e.target.id === item.userid) {
+      //   return { ...item, isChecked: !item.isChecked };
+      // } else if (e.target.id !== item.userid) {
+      //   return item;
+      // }
+    });
+
+    this.setState(state => ({
+      checkedNow: !state.checkedNow,
+      items: this.props.items.fetchedData
+    }));
+    console.log("checked", this.state);
+  }
+
+  updateItem(e) {
+    // console.log("before", this.props.items.fetchedData.isUpdated);
+    this.props.items.fetchedData = this.props.items.fetchedData.map(item => {
+      return e.target.id === item.userid
+        ? { ...item, isUpdated: !item.isUpdated }
+        : item;
+      // if (e.target.id === item.userid) {
+      //   return { ...item, isChecked: !item.isChecked };
+      // } else if (e.target.id !== item.userid) {
+      //   return item;
+      // }
+    });
+    // console.log("after", this.props.items.fetchedData.isUpdated);
+    let letContent = this.props.items.fetchedData.filter(
+      item => e.target.id === item.userid
+    );
+    console.log("type", typeof letContent, letContent);
+
+    this.setState(state => ({
+      items: this.props.items.fetchedData,
+      update: letContent[0].content
+    }));
+    console.log("content -> update property", this.state);
+  }
   render() {
     const { items } = this.state; // 객체 deStructuring
-    console.log(items);
+    console.log("when rendering", items);
     return (
       <Container className="list-Container">
         <FormGroup>
@@ -169,7 +231,7 @@ class ItemList extends Component {
           <ListGroup>
             <TransitionGroup className="shopping-list">
               {items.map(
-                ({ userid, content, heading }) =>
+                ({ userid, content, heading, isChecked, isUpdated }) =>
                   userid !== "undefined" && (
                     <CSSTransition key={userid} timeout={500} classNames="fade">
                       <ListGroupItem key={userid}>
@@ -200,23 +262,75 @@ class ItemList extends Component {
                         >
                           &times;
                         </Button>
-                        <div className="radio-box">
-                          <input type="checkbox" id="cb1" />
-                          <label for="cb1" />
+                        <div
+                          className="radio-box"
+                          style={{
+                            position: "relative"
+                          }}
+                        >
+                          <div
+                            style={{
+                              position: "relative",
+                              width: "15px",
+                              height: "15px",
+                              border: "1px solid darkgoldenrod",
+                              zIndex: "2"
+                            }}
+                            onClick={this.chkBtn.bind(this)}
+                            id={userid}
+                          />
+                          <label htmlFor="cb1" />
+                          {/* 해당 구문은 논리비교 조건식으로 만들어서 클릭되면 해당 엘리먼트를 렌더링하게 한다,
+                          클릭된 요소만   */}
+                          {isChecked && (
+                            <ion-icon
+                              for="cb1"
+                              name="md-checkmark"
+                              style={{
+                                position: "absolute",
+                                top: "0",
+                                zIndex: "1"
+                              }}
+                            />
+                          )}
                         </div>
                         <ListGroupItemHeading>{heading}</ListGroupItemHeading>
                         <ListGroupItemText>
                           {Object.values(content).length === 1 && content}
                         </ListGroupItemText>
-
-                        {/*  (console.log("TEST", Object.values(content).length),
-                         typeof content) */}
                         {typeof content !== "string" &&
                           Object.values(content).length > 1 &&
                           Object.values(content).map(t => (
                             <ListGroupItemText>{t}</ListGroupItemText>
                           ))}
                         {/* content는 객체화 되어 있어서 직접 map을 실행할 수 없다 */}
+                        <button
+                          id={userid}
+                          onClick={this.updateItem.bind(this)}
+                        >
+                          UPDATE
+                        </button>
+                        {/* {console.log("isUpdated", isUpdated)} */}
+                        {isUpdated && (
+                          <div>
+                            <input
+                              value={this.state.update}
+                              onChange={this.update}
+                            />
+                          </div>
+                        )}
+                        {/* {console.log(
+                          "Object.values",
+                          typeof Object.values(content).join()
+                        )}
+                        {console.log(content)} */}
+                        {/* {!isUpdated && (
+                          <input
+                            type="text"
+                            value={Object.values(content).join()}
+                            onChange={this.update}
+                          />
+                        )} */}
                       </ListGroupItem>
                     </CSSTransition>
                   )

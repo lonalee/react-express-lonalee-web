@@ -14,7 +14,13 @@ export default function(state = initialState, action) {
       return {
         ...state,
         isFetched: !state.isFetched,
-        fetchedData: action.payload
+        fetchedData: action.payload.map(item => {
+          return {
+            ...item,
+            isChecked: false,
+            isUpdated: false
+          };
+        })
       };
     case IS_ADDED:
       return {

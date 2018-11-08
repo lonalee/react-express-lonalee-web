@@ -153,9 +153,17 @@ input[id="cb1"] + label {
   border: 2px solid #bcbcbc;
   cursor: pointer;
 }
+
+/* !!!when checked!!! */
 input[id="cb1"]:checked + label {
   background-color: #da1818;
 }
+/* input[id="cb1"]:checked + ion-icon {
+  visibility: visible;
+} */
 input[id="cb1"] {
   display: none;
 }
+/* .hydrated {
+  visibility: hidden;
+} */
