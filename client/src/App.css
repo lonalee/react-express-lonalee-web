@@ -20,7 +20,7 @@
   padding: 10px;
 }
 .list-group-item-text {
-  margin-left: 47px;
+  /* margin-left: 47px; */
 }
 /* Remove Button */
 .remove-btn {
@@ -146,24 +146,37 @@ section h2 {
 }
 
 /* CHK BOX */
-input[id="cb1"] + label {
+/* input[id="cb1"] + label {
   display: inline-block;
   width: 20px;
   height: 20px;
   border: 2px solid #bcbcbc;
   cursor: pointer;
-}
+} */
 
 /* !!!when checked!!! */
-input[id="cb1"]:checked + label {
+/* input[id="cb1"]:checked + label {
   background-color: #da1818;
-}
+} */
 /* input[id="cb1"]:checked + ion-icon {
   visibility: visible;
 } */
-input[id="cb1"] {
+/* input[id="cb1"] {
   display: none;
-}
+} */
 /* .hydrated {
   visibility: hidden;
 } */
+
+/* *** UPDATE *** */
+.update-btn {
+  position: absolute;
+  right: 10px;
+  top: 80px;
+}
+
+.save-btn {
+  position: absolute;
+  right: 90px;
+  top: 80px;
+}

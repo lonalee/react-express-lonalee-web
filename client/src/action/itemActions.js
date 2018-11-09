@@ -1,6 +1,7 @@
 import Axios from "axios";
 import { IS_FETCHED } from "./types";
 import { IS_ADDED } from "./types";
+import { IS_UPDATED } from "./types";
 
 export const postItem = newItem => dispatch => {
   console.log(newItem);
@@ -24,4 +25,16 @@ export const fetchItem = () => dispatch => {
       payload: res.data
     });
   });
+};
+
+export const updateItem = (id, updatedContent) => dispatch => {
+  console.log(updatedContent);
+  Axios.put(`/api/items/${id}`, updatedContent)
+    .then(res => {
+      dispatch({
+        type: IS_UPDATED,
+        payload: res.data
+      });
+    })
+    .catch(err => console.log(err));
 };

@@ -15,6 +15,7 @@ import uuid from "uuid";
 
 import { postItem } from "../../action/itemActions";
 import { fetchItem } from "../../action/itemActions";
+import { updateItem } from "../../action/itemActions";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
@@ -31,10 +32,10 @@ class ItemList extends Component {
           isUpdated: false
         }
       ],
-      content: "", // input value를 위한 임시 프로퍼티
+      content: "", // input value를 위한 프로퍼티
       isFetched: false,
       checkedNow: false,
-      update: ""
+      update: [] // update를 위한 프로퍼티
     };
   }
 
@@ -124,12 +125,7 @@ class ItemList extends Component {
     this.setState({ content: e.target.value }); // 일시적으로 입력되는 값을 저장
   };
   update = e => {
-    // console.dir(e.target);
-    console.log("value", e.target.value);
-
     this.setState({ update: e.target.value });
-    console.log("update", this.state.update);
-    // e.target.value = this.state.update;
   };
   chkBtn(e) {
     console.log("e.target.id", e.target.id);
@@ -137,11 +133,6 @@ class ItemList extends Component {
       return e.target.id === item.userid
         ? { ...item, isChecked: !item.isChecked }
         : item;
-      // if (e.target.id === item.userid) {
-      //   return { ...item, isChecked: !item.isChecked };
-      // } else if (e.target.id !== item.userid) {
-      //   return item;
-      // }
     });
 
     this.setState(state => ({
@@ -173,8 +164,40 @@ class ItemList extends Component {
       items: this.props.items.fetchedData,
       update: letContent[0].content
     }));
-    console.log("content -> update property", this.state);
+    // console.log("content -> update property", this.state);
   }
+
+  // SAVE btn clicked
+  finishUpdate = e => {
+    let updatedItem = {
+      userid: "",
+      content: "",
+      heading: ""
+    };
+    this.props.items.fetchedData = this.props.items.fetchedData.map(item => {
+      // return e.target.id === item.userid ? { ...item, isUpdated: false } : item;
+      if (e.target.id === item.userid) {
+        updatedItem.userid = item.userid;
+        updatedItem.content = this.state.update.split("\n");
+        console.log(updatedItem.content);
+        updatedItem.heading = item.heading;
+
+        return { ...item, isUpdated: false, content: updatedItem.content };
+      } else return item;
+    });
+    // console.log(this.props.items.fetchedData);
+    this.setState({
+      items: this.props.items.fetchedData
+    });
+
+    // const updatedItem = {
+    //   userid: e.target.id,
+    //   content: this.state.update
+    // };
+    console.log("type of ", typeof updatedItem, updatedItem);
+    this.props.updateItem(e.target.id, updatedItem);
+  };
+
   render() {
     const { items } = this.state; // 객체 deStructuring
     console.log("when rendering", items);
@@ -184,12 +207,12 @@ class ItemList extends Component {
           <Form className="form-text-area">
             <Label>Any comments?</Label>
             <textarea
-              // tabIndex="0"
               className="text-area"
               value={this.state.content}
               onChange={this.onChange}
             />
             <input type="date" />
+            <div>div</div>
           </Form>
         </FormGroup>
         <Button
@@ -242,14 +265,6 @@ class ItemList extends Component {
                           color="danger"
                           size="sm"
                           onClick={() => {
-                            // this.state.items.forEach(item =>
-                            //   console.log(
-                            //     "item.id =",
-                            //     item.userid,
-                            //     "id =",
-                            //     userid
-                            //   )
-                            // );
                             this.setState(state => ({
                               items: state.items.filter(
                                 item => item.userid !== userid
@@ -294,43 +309,51 @@ class ItemList extends Component {
                             />
                           )}
                         </div>
-                        <ListGroupItemHeading>{heading}</ListGroupItemHeading>
-                        <ListGroupItemText>
-                          {Object.values(content).length === 1 && content}
-                        </ListGroupItemText>
-                        {typeof content !== "string" &&
+
+                        {/* isUpdated = true이면 ItemHeading과 ItemText의 format을 변경 */}
+                        {!isUpdated && (
+                          <div>
+                            <ListGroupItemHeading>
+                              {heading}
+                            </ListGroupItemHeading>
+                            <ListGroupItemText>
+                              {Object.values(content).length === 1 && content}
+                            </ListGroupItemText>
+                          </div>
+                        )}
+                        {/* 사용자 입력값에 개행이 존재할 경우 처리 */}
+                        {!isUpdated &&
+                          typeof content !== "string" &&
                           Object.values(content).length > 1 &&
                           Object.values(content).map(t => (
                             <ListGroupItemText>{t}</ListGroupItemText>
                           ))}
                         {/* content는 객체화 되어 있어서 직접 map을 실행할 수 없다 */}
                         <button
+                          className="update-btn"
                           id={userid}
                           onClick={this.updateItem.bind(this)}
                         >
                           UPDATE
                         </button>
-                        {/* {console.log("isUpdated", isUpdated)} */}
                         {isUpdated && (
                           <div>
-                            <input
+                            <textarea
                               value={this.state.update}
                               onChange={this.update}
+                              className="textarea-update"
+                              cols="30"
+                              rows="10"
                             />
+                            <button
+                              id={userid}
+                              className="save-btn"
+                              onClick={this.finishUpdate}
+                            >
+                              SAVE
+                            </button>
                           </div>
                         )}
-                        {/* {console.log(
-                          "Object.values",
-                          typeof Object.values(content).join()
-                        )}
-                        {console.log(content)} */}
-                        {/* {!isUpdated && (
-                          <input
-                            type="text"
-                            value={Object.values(content).join()}
-                            onChange={this.update}
-                          />
-                        )} */}
                       </ListGroupItem>
                     </CSSTransition>
                   )
@@ -348,11 +371,6 @@ class ItemList extends Component {
             You may want to Fetch Data from database.
           </p>
         )}
-        {/* <div>
-          {this.state.items.map(item => (
-            <textarea value={this.state.content} onChange={this.onChange} />
-          ))}
-        </div> */}
       </Container>
     );
   }
@@ -361,7 +379,8 @@ class ItemList extends Component {
 ItemList.propTypes = {
   items: PropTypes.object.isRequired,
   fetchItem: PropTypes.func.isRequired,
-  postItem: PropTypes.func.isRequired
+  postItem: PropTypes.func.isRequired,
+  updateItem: PropTypes.func.isRequired
 };
 
 const mapStatetoProps = state => ({
@@ -370,5 +389,5 @@ const mapStatetoProps = state => ({
 
 export default connect(
   mapStatetoProps,
-  { fetchItem, postItem }
+  { fetchItem, postItem, updateItem }
 )(ItemList);
