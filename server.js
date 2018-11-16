@@ -18,7 +18,7 @@ app.use(bodyParser.json());
 app.use(passport.initialize());
 require("./config/passport")(passport);
 
-// User Routes
+// Use Routes
 app.use("/api/users", users);
 app.use("/api/profiles", profiles);
 app.use("/api/posts", posts);

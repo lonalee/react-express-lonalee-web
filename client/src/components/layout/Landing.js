@@ -17,11 +17,6 @@ class Landing extends Component {
             <div className="row">
               <div className="col-md-12 text-center">
                 <h1 className="display-3">Stay Connected</h1>
-                <p className="lead">
-                  {" "}
-                  Create a developer profile/portfolio, share posts and get help
-                  from other developers
-                </p>
 
                 <Link to="/register" className="landing-btn btn btn-lg mr-2">
                   Sign Up

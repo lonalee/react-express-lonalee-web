@@ -24,7 +24,10 @@
 }
 /* Remove Button */
 .remove-btn {
-  margin-right: 20px;
+  position: absolute;
+  right: 10px;
+  width: 76.39px;
+  top: 40px;
 }
 /* Register.js */
 .register {
@@ -170,13 +173,18 @@ section h2 {
 
 /* *** UPDATE *** */
 .update-btn {
-  position: absolute;
   right: 10px;
   top: 80px;
 }
 
 .save-btn {
-  position: absolute;
   right: 90px;
   top: 80px;
+}
+.delete-btn {
+  right: 10px;
+  top: 120px;
+}
+.btn-list {
+  position: absolute;
 }

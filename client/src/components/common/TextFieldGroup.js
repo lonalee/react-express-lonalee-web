@@ -3,6 +3,7 @@ import Proptypes from "prop-types";
 import classnames from "classnames";
 
 const TextFieldGroup = ({
+  // 인자로 element의 프로퍼티를 넘긴다 {} 필요
   name,
   placeholder,
   type,
@@ -26,7 +27,7 @@ const TextFieldGroup = ({
         onChange={onChange}
         disabled={disabled}
       />
-      {info && <small className="form-text text-muted">{info}</small>}
+      {info && !error && <small className="form-text text-muted">{info}</small>}
       {error && <div className="invalid-feedback">{error}</div>}
     </div>
   );

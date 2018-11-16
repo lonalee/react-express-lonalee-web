@@ -4,6 +4,7 @@ import jwt_decode from "jwt-decode";
 import setAuthToken from "./utils/setAuthToken";
 import { setCurrentUser } from "./action/authActions";
 import { logoutUser } from "./action/authActions";
+import { clearCurrentProfile } from "./action/profileActions";
 
 import { Provider } from "react-redux";
 import store from "./store";
@@ -16,6 +17,7 @@ import Profile from "./components/profile/Profile";
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
 import ItemList from "./components/list/ItemList";
+import Dashboard from "./components/dashboard/Dashboard";
 import "./App.css";
 import "./queries.css";
 
@@ -32,6 +34,7 @@ if (localStorage.jwtToken) {
   const currentTime = Date.now() / 1000;
   if (decoded.exp < currentTime) {
     store.dispatch(logoutUser());
+    store.dispatch(clearCurrentProfile());
     // redirect to landing page
     window.location.href = "/";
   }
@@ -50,6 +53,7 @@ class App extends Component {
               <Route exact path="/Profile" component={Profile} />
               <Route exact path="/Login" component={Login} />
               <Route exact path="/Register" component={Register} />
+              <Route exact path="/dashboard" component={Dashboard} />
               <Route exact path="/ItemList" component={ItemList} />
               {/* App.js에서 라우트 태그로 정의해준다 */}
             </div>

@@ -16,6 +16,7 @@ import uuid from "uuid";
 import { postItem } from "../../action/itemActions";
 import { fetchItem } from "../../action/itemActions";
 import { updateItem } from "../../action/itemActions";
+import { deleteItem } from "../../action/itemActions";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
@@ -49,12 +50,15 @@ class ItemList extends Component {
   }
   componentWillReceiveProps(nextProps) {
     if (nextProps) {
-      console.log("nextProps", nextProps.items.fetchedData);
+      console.log(
+        "nextProps.items.fetchedData:::",
+        nextProps.items.fetchedData
+      );
       this.setState({
         isFetched: nextProps.items.isFetched,
         items: [...nextProps.items.fetchedData]
       });
-      console.log("componentWillReceiveProps", this.state);
+      console.log("componentWillReceiveProps this.state:::", this.state);
     }
     if (nextProps.items.isAdded) {
       console.log("is_Added", nextProps);
@@ -62,14 +66,28 @@ class ItemList extends Component {
         items: [nextProps.items.addedData, ...this.state.items]
       });
       nextProps.items.addedData = "";
+      nextProps.items.isAdded = !nextProps.items.isAdded;
+    }
+
+    if (nextProps.items.isDeleted) {
+      // console.log("is Deleted", nextProps.items.isDeleted);
+      // console.log("nextProps.items.fetchedData", nextProps.items.fetchedData);
+      // console.log("this.props.items.deletedId", nextProps.items);
+      this.props.items.fetchedData = nextProps.items.fetchedData.filter(
+        item => item.userid !== nextProps.items.deletedId
+      );
+      console.log("after delete", this.props.items.fetchedData);
+      this.setState({
+        items: this.props.items.fetchedData
+      });
+      console.log("after delete state", this.state.items);
     }
   }
 
   // When FETCH button clicked
   fetchAll = () => {
     this.props.fetchItem();
-    // fetchItem();
-    console.log(this.props);
+    console.log("this.props", this.props);
     console.log("fetchAll", this.state);
   };
 
@@ -88,20 +106,9 @@ class ItemList extends Component {
     this.setState({ content: "" });
   };
   // delItem for AJAX request
-  delItem = content => {
-    // console.log(name);
-    const xhr = new XMLHttpRequest();
-    xhr.open("DELETE", `/api/items/${content}`);
-    xhr.send();
-    xhr.onreadystatechange = function(e) {
-      if (xhr.readyState === XMLHttpRequest.DONE) {
-        if (xhr.status === 200) {
-          console.log(xhr.responseText);
-        } else {
-          console.log("Error!");
-        }
-      }
-    };
+  delItem = id => {
+    console.log("delItem called", id);
+    this.props.deleteItem(id);
   };
   // delete All
   delAll = () => {
@@ -154,17 +161,14 @@ class ItemList extends Component {
       //   return item;
       // }
     });
-    // console.log("after", this.props.items.fetchedData.isUpdated);
     let letContent = this.props.items.fetchedData.filter(
       item => e.target.id === item.userid
     );
-    console.log("type", typeof letContent, letContent);
 
     this.setState(state => ({
       items: this.props.items.fetchedData,
       update: letContent[0].content
     }));
-    // console.log("content -> update property", this.state);
   }
 
   // SAVE btn clicked
@@ -211,8 +215,6 @@ class ItemList extends Component {
               value={this.state.content}
               onChange={this.onChange}
             />
-            <input type="date" />
-            <div>div</div>
           </Form>
         </FormGroup>
         <Button
@@ -236,7 +238,7 @@ class ItemList extends Component {
             }
           }}
         >
-          Delete All
+          Delete checked Items
         </Button>
         {/* FETCH from myDB */}
         <Button
@@ -250,7 +252,7 @@ class ItemList extends Component {
           FETCH from myDB
         </Button>
         {/* {this.state.items.length === 0 && "FETCH or Add Item"} */}
-        {this.props.items.isFetched ? (
+        {this.props.items.isFetched || this.props.items.isAdded ? (
           <ListGroup>
             <TransitionGroup className="shopping-list">
               {items.map(
@@ -261,21 +263,21 @@ class ItemList extends Component {
                         {/* ListGroup => ul ListGroupItem => li */}
                         <Button
                           key={userid}
-                          className="remove-btn rounded-circle"
+                          className="remove-btn"
                           color="danger"
                           size="sm"
                           onClick={() => {
-                            this.setState(state => ({
-                              items: state.items.filter(
-                                item => item.userid !== userid
-                              )
-                            }));
-                            // map 과정에서 모든 요소들의 key 프로퍼티에 items의 id가 할당되었다
-                            // filter iteration에서 state.items의 id와 클릭된 아이템의 id를 비교해서 조건식을 만족하지 못하면 filter한다. iteration 밖에서는 참조할 수 없다
+                            //   // this.setState(state => ({
+                            //   //   items: state.items.filter(
+                            //   //     item => item.userid !== userid
+                            //   //   )
+                            //   // }));
+                            //   // map 과정에서 모든 요소들의 key 프로퍼티에 items의 id가 할당되었다
+                            //   // filter iteration에서 state.items의 id와 클릭된 아이템의 id를 비교해서 조건식을 만족하지 못하면 filter한다. iteration 밖에서는 참조할 수 없다
                             this.delItem(userid);
                           }}
                         >
-                          &times;
+                          DELETE
                         </Button>
                         <div
                           className="radio-box"
@@ -330,12 +332,20 @@ class ItemList extends Component {
                           ))}
                         {/* content는 객체화 되어 있어서 직접 map을 실행할 수 없다 */}
                         <button
-                          className="update-btn"
+                          className="update-btn btn-list"
                           id={userid}
                           onClick={this.updateItem.bind(this)}
                         >
                           UPDATE
                         </button>
+
+                        {/* <button
+                          className="delete-btn btn-list"
+                          id={userid}
+                          onClick={this.delItem(userid)}
+                        >
+                          DELETE
+                        </button> */}
                         {isUpdated && (
                           <div>
                             <textarea
@@ -347,7 +357,7 @@ class ItemList extends Component {
                             />
                             <button
                               id={userid}
-                              className="save-btn"
+                              className="save-btn btn-list"
                               onClick={this.finishUpdate}
                             >
                               SAVE
@@ -380,7 +390,8 @@ ItemList.propTypes = {
   items: PropTypes.object.isRequired,
   fetchItem: PropTypes.func.isRequired,
   postItem: PropTypes.func.isRequired,
-  updateItem: PropTypes.func.isRequired
+  updateItem: PropTypes.func.isRequired,
+  deleteItem: PropTypes.func.isRequired
 };
 
 const mapStatetoProps = state => ({
@@ -389,5 +400,5 @@ const mapStatetoProps = state => ({
 
 export default connect(
   mapStatetoProps,
-  { fetchItem, postItem, updateItem }
+  { fetchItem, postItem, updateItem, deleteItem }
 )(ItemList);

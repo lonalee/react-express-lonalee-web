@@ -41,6 +41,19 @@ router.delete("/all", (req, res) => {
     .then(items => items.remove().then(() => res.json({ success: true })))
     .catch(err => res.status(404).json({ err }));
 });
+// @route DELETE api/items/all
+// @desc DELETE All
+// @access Public
+router.put("/:id", (req, res) => {
+  Item.findOneAndUpdate(
+    { userid: req.params.id },
+    { content: req.body.content },
+    // { returnNewDocument: true },
+    { returnOriginal: false }
+  )
+    .then(update => res.json(update))
+    .catch(err => res.status(404).json({ err }));
+});
 
 // export default router; // es6
 module.exports = router;

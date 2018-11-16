@@ -4,11 +4,13 @@ import { combineReducers } from "redux";
 import authReducer from "./authReducer";
 import errorReducer from "./errorReducer";
 import itemReducer from "./itemReducer";
+import profileReducer from "./profileReducer";
 
 export default combineReducers({
   auth: authReducer,
   errors: errorReducer,
-  items: itemReducer
+  items: itemReducer,
+  profile: profileReducer
   // 하위 reducer인 authReducer를 import하여
   // store에서 rootReducer를 import한다.
 });

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import classnames from "classnames";
+// import classnames from "classnames";
 import { loginUser } from "../../action/authActions";
 import { withRouter } from "react-router-dom";
 
@@ -81,8 +81,18 @@ class Login extends Component {
                   name="email"
                   value={this.state.email}
                   onChange={this.onChange}
+                  type="email"
+                  error={errors.email}
                 />
-                <div className="form-group">
+                <TextFieldGroup
+                  type="password"
+                  name="password"
+                  value={this.state.password}
+                  onChange={this.onChange}
+                  error={errors.password}
+                  placeholder="password"
+                />
+                {/* <div className="form-group">
                   <input
                     type="password"
                     className={classnames("form-control form-control-lg", {
@@ -96,7 +106,7 @@ class Login extends Component {
                   {errors.password && (
                     <div className="invalid-feedback">{errors.password}</div>
                   )}
-                </div>
+                </div> */}
                 <input type="submit" className="btn btn-info btn-block mt-4" />
               </form>
             </div>
