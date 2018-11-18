@@ -3,7 +3,63 @@ import Navbar from "../layout/Navbar";
 import Footer from "../layout/Footer";
 
 class Profile extends Component {
+  constructor() {
+    super();
+    this.state = {
+      selectSkills: [
+        "HTML",
+        "CSS",
+        "JavaScript",
+        "Angular",
+        "React",
+        "Vue",
+        "Express",
+        "MongoDB",
+        "Mongoose"
+      ],
+      selected: [],
+      myHistory: [
+        {
+          history: "",
+          date: ""
+        }
+      ],
+      achievements: [],
+      userInput: "",
+      userDate: ""
+    };
+  }
+
+  selectMySkill = e => {
+    console.dir(e.target);
+    console.log(e.target.value);
+  };
+
+  onChange(e) {
+    this.setState({
+      userInput: e.target.value
+    });
+  }
+  onClick(e) {
+    this.setState({
+      myHistory: [
+        { history: this.state.userInput, date: this.state.userDate },
+        ...this.state.myHistory
+      ],
+      userInput: "",
+      userDate: ""
+    });
+  }
+
+  changeDate(e) {
+    console.log(e.target.value);
+    this.setState({
+      userDate: e.target.value
+    });
+  }
+
   render() {
+    const selectSkills = this.state.selectSkills;
     return (
       <div>
         <Navbar />
@@ -37,6 +93,125 @@ class Profile extends Component {
             </li>
           </ul>
         </aside>
+        <div className="form-container" style={{ marginTop: "100px" }}>
+          <form onSubmit={this.onSubmit}>
+            <div
+              className="form-group form-row"
+              style={{ width: "100%", marginLeft: "1px" }}
+            >
+              <div className="col">
+                <label htmlFor="historyInput" className="history">
+                  <h4>My history</h4>
+                </label>
+                <input
+                  id="historyInput"
+                  name="historyInput"
+                  type="text"
+                  className="history-input form-control"
+                  onChange={this.onChange.bind(this)}
+                  value={this.state.userInput}
+                />
+                {this.state.myHistory.map(history => (
+                  <div key={history.history}>
+                    {history.date && history.history}
+                  </div>
+                ))}
+              </div>
+              <div className="col">
+                <label htmlFor="date" className="date">
+                  <h4>When was it?</h4>
+                </label>
+                <input
+                  id="date"
+                  type="date"
+                  className="date-input form-control"
+                  onChange={this.changeDate.bind(this)}
+                  value={this.state.userDate}
+                />
+                {this.state.myHistory.map(history => (
+                  <div key={history.history}>
+                    {history.date && history.date}
+                  </div>
+                ))}
+              </div>
+              <div className="click-icon" onClick={this.onClick.bind(this)}>
+                <i
+                  className="fas fa-user-check"
+                  style={{
+                    fontSize: "35px"
+                  }}
+                />
+              </div>
+            </div>
+            <div
+              className="form-group form-row"
+              style={{ width: "100%", marginLeft: "1px" }}
+            >
+              <div className="col">
+                <label htmlFor="">
+                  <h4>Achievements</h4>
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  onChange={this.onChange.bind(this)}
+                />
+              </div>
+              <div className="col">
+                <label htmlFor="">
+                  <h4>When was it?</h4>
+                </label>
+                <input
+                  className="form-control date-input"
+                  type="date"
+                  onChange={this.onChange.bind(this)}
+                />
+              </div>
+
+              <div className="click-icon" onClick={this.onClick.bind(this)}>
+                <i
+                  className="fas fa-user-check"
+                  style={{
+                    fontSize: "35px"
+                  }}
+                />
+              </div>
+            </div>
+            <div className="form-group">
+              <label htmlFor="skill-set" className="skill-set">
+                <h4>Skill Set</h4>
+              </label>
+              <select
+                name="skill-set"
+                id="skill-set"
+                className="form-control skill-set"
+                onChange={this.selectMySkill}
+                style={{
+                  width: "75%",
+                  marginLeft: "6px"
+                }}
+              >
+                {selectSkills.map(skill => (
+                  <option key={skill}>{skill}</option>
+                ))}
+              </select>
+              <div className="click-icon" onClick={this.onClick.bind(this)}>
+                <i
+                  className="fas fa-user-check"
+                  style={{
+                    fontSize: "35px"
+                  }}
+                />
+              </div>
+            </div>
+            <div className="selectedSkills">
+              <ul className="skills">
+                <li />
+              </ul>
+            </div>
+            <button>SAVE</button>
+          </form>
+        </div>
         <div className="section-container">
           <section className="section-1">
             <h2 id="about-Me">1. about Me?</h2>
