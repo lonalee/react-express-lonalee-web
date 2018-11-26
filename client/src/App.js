@@ -18,6 +18,8 @@ import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
 import ItemList from "./components/list/ItemList";
 import Dashboard from "./components/dashboard/Dashboard";
+
+import MouseTracker from "./components/renderProp/render";
 import "./App.css";
 import "./queries.css";
 
@@ -56,6 +58,7 @@ class App extends Component {
               <Route exact path="/dashboard" component={Dashboard} />
               <Route exact path="/ItemList" component={ItemList} />
               {/* App.js에서 라우트 태그로 정의해준다 */}
+              <Route exact path="/mouse" component={MouseTracker} />
             </div>
             <Footer />
           </div>
