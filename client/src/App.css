@@ -1,3 +1,7 @@
+.landing h1 {
+  font-family: "Oswald", sans-serif;
+}
+
 /* Text Area */
 .form-text-area {
   margin-bottom: 60px;
@@ -87,6 +91,17 @@ img {
   background-color: orange;
 }
 
+.container-btn {
+  /* position: absolute; */
+  margin: 200px auto;
+  width: 194px;
+  animation-delay: 1s;
+  animation-duration: 3s;
+}
+
+.btn {
+}
+
 /* Footer */
 footer {
   opacity: 0.5;
@@ -104,12 +119,6 @@ footer {
 
 /* My Profile */
 /* ------ section --------- */
-.section-container {
-  /* margin-top: 100px; */
-}
-.section-container section {
-  /* margin-bottom: 150px; */
-}
 
 section h2 {
   padding-top: 80px;

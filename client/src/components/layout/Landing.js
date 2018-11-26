@@ -16,16 +16,19 @@ class Landing extends Component {
           <div className="container">
             <div className="row">
               <div className="col-md-12 text-center">
-                <h1 className="display-3">Stay Connected</h1>
-
-                <Link to="/register" className="landing-btn btn btn-lg mr-2">
-                  Sign Up
-                </Link>
-                {/* a 태그는 link 태그로 바뀌어야 한다, (in React, router 적용 후) */}
-                <Link to="/login" className="btn btn-lg btn-light">
-                  Login
-                </Link>
+                <h1 className="landing-text display-3">Stay Connected</h1>
+                <h3 className="landing-text display-4">O.M.T</h3>
+                <small>Only a Matter of Time</small>
               </div>
+            </div>
+            <div className="animated infinite heartBeat container-btn">
+              <Link to="/register" className=" landing-btn btn btn-lg mr-2">
+                Sign Up
+              </Link>
+              {/* a 태그는 link 태그로 바뀌어야 한다, (in React, router 적용 후) */}
+              <Link to="/login" className="btn btn-lg btn-light">
+                Login
+              </Link>
             </div>
           </div>
         </div>
