@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const passport = require("passport");
 
+const path = require("path");
+
 // routes
 const users = require("./routes/api/users");
 const profiles = require("./routes/api/profiles");
@@ -24,7 +26,13 @@ app.use("/api/profiles", profiles);
 app.use("/api/posts", posts);
 app.use("/api/items", items);
 
-//
+// SERVER Static Assets if in production
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static("client/build"));
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  });
+}
 
 const port = process.env.PORT || 5200;
 // process.env.PORT for deploy to HEROKU
