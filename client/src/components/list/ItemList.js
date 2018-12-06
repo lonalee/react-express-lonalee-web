@@ -256,7 +256,7 @@ class ItemList extends Component {
           <ListGroup>
             <TransitionGroup className="shopping-list">
               {items.map(
-                ({ userid, content, heading, isChecked, isUpdated }) =>
+                ({ _id, userid, content, heading, isChecked, isUpdated }) =>
                   userid !== "undefined" && (
                     <CSSTransition key={userid} timeout={500} classNames="fade">
                       <ListGroupItem key={userid}>

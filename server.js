@@ -10,6 +10,7 @@ const users = require("./routes/api/users");
 const profiles = require("./routes/api/profiles");
 const posts = require("./routes/api/posts");
 const items = require("./routes/api/items");
+const myProfile = require("./routes/api/myProfile");
 //
 const app = express();
 
@@ -25,6 +26,7 @@ app.use("/api/users", users);
 app.use("/api/profiles", profiles);
 app.use("/api/posts", posts);
 app.use("/api/items", items);
+app.use("/api/myprofile", myProfile);
 
 // SERVER Static Assets if in production
 if (process.env.NODE_ENV === "production") {

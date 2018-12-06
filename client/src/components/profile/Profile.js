@@ -4,7 +4,7 @@ import Footer from "../layout/Footer";
 
 import { Table } from "reactstrap";
 
-import { setCurrentProfile } from "../../action/myProfileActions";
+import { setCurrentProfile, saveMyPofile } from "../../action/myProfileActions";
 import { connect } from "react-redux";
 
 import uuid from "uuid";
@@ -14,6 +14,7 @@ class Profile extends Component {
     super();
     this.state = {
       selectSkills: [
+        "-",
         "HTML",
         "CSS",
         "JavaScript",
@@ -32,9 +33,9 @@ class Profile extends Component {
       //     date: ""
       //   }
       // ],
-      currentHistory: {
-        no: 0
-      },
+      historyNo: 0,
+      achievementNo: 0,
+      skillsNo: 0,
       historyTouched: false,
       achievementsTouched: false,
       // myAchievements: [
@@ -59,8 +60,17 @@ class Profile extends Component {
   }
 
   selectMySkill = e => {
-    console.dir(e.target);
-    console.log(e.target.value);
+    const currentData = {
+      no: this.state.skillsNo + 1,
+      id: uuid(),
+      ref: "mySkills",
+      skill: e.target.value
+    };
+    this.setState(state => ({
+      ...state,
+      skillsNo: state.skillsNo + 1
+    }));
+    this.props.setCurrentProfile(currentData);
   };
 
   onChange(e) {
@@ -70,50 +80,49 @@ class Profile extends Component {
     });
   }
   onClick(e) {
-    console.log(this.state);
-    console.log(e.target.className);
-    const currentData =
-      e.target.className === "myHistory"
-        ? {
-            no: this.state.currentHistory.no + 1,
-            id: uuid(),
-            history: this.state.historyInput,
-            historyDate: this.state.historyDateInput
-          }
-        : {
-            no: this.state.currentHistory.no + 1,
-            id: uuid(),
-            achievement: this.state.achievementsInput,
-            achievementDate: this.state.achievementsDateInput
-          };
-
-    this.props.setCurrentProfile(currentData);
-    // this.setState(state => ({
-    //   ...state,
-    //   historyInput: "",
-    //   historyDateInput: ""
-    // }));
     if (e.target.className === "myHistory") {
+      const currentData = {
+        no: this.state.historyNo + 1,
+        id: uuid(),
+        ref: "myHistory",
+        history: this.state.historyInput,
+        historyDate: this.state.historyDateInput
+      };
       this.setState(state => ({
         ...state,
+        historyNo: state.historyNo + 1,
         historyInput: "",
         historyDateInput: ""
       }));
-    } else
+      this.props.setCurrentProfile(currentData);
+    } else if (e.target.className === "myAchievements") {
+      const currentData = {
+        no: this.state.achievementNo + 1,
+        id: uuid(),
+        ref: "myAchievements",
+        achievement: this.state.achievementsInput,
+        achievementDate: this.state.achievementsDateInput
+      };
       this.setState(state => ({
         ...state,
+        achievementNo: state.achievementNo + 1,
         achievementsInput: "",
         achievementsDateInput: ""
       }));
+      this.props.setCurrentProfile(currentData);
+    }
   }
 
   changeDate(e) {
-    console.log(e.target.value);
     this.setState({
       historyDateInput: e.target.value
     });
   }
-
+  saveMyPofile = e => {
+    const userId = this.props.user.user.id;
+    this.props.saveMyPofile({ userId: userId, ...this.props.myProfile });
+    e.preventDefault();
+  };
   render() {
     const selectSkills = this.state.selectSkills;
     return (
@@ -249,29 +258,55 @@ class Profile extends Component {
                   className="form-control date-input"
                   placeholder="입력 예 : YY-MM-DD ~ YY-MM-DD"
                   onChange={this.onChange.bind(this)}
+                  value={this.state.achievementsDateInput}
                 />
               </div>
-              <div className="click-icon" onClick={this.onClick.bind(this)}>
+              <div className="click-icon">
+                <div
+                  className="myAchievements"
+                  style={{
+                    height: "100%",
+                    width: "100%",
+                    position: "absolute",
+                    zIndex: "2"
+                  }}
+                  onClick={this.onClick.bind(this)}
+                />
                 <i
                   className="fas fa-user-check"
                   style={{
-                    fontSize: "35px"
+                    fontSize: "35px",
+                    position: "absolute",
+                    zIndex: "1",
+                    marginLeft: "10px"
                   }}
                 />
               </div>
-              {this.state.achievementsTouched && (
-                <div>
-                  <ul>
-                    {this.state.myAchievements.map(hisObj => (
-                      <li key={hisObj.id}>
-                        {hisObj.achievements}
-                        {hisObj.achievementDate}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
             </div>
+            {this.props.myProfile.myAchievements.length > 0 && (
+              <Table>
+                <thead>
+                  <tr>
+                    <th>No.</th>
+                    <th>achievements</th>
+                    <th>period</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {this.props.myProfile.myAchievements.map(achievements => (
+                    <tr key={achievements.id}>
+                      <th key={achievements.no}>{achievements.no}</th>
+                      <td key={achievements.achievement}>
+                        {achievements.achievement}
+                      </td>
+                      <td key={achievements.achievementDate}>
+                        {achievements.achievementDate}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            )}
             <div className="form-group">
               <label htmlFor="skill-set" className="skill-set">
                 <h4>Skill Set</h4>
@@ -290,21 +325,54 @@ class Profile extends Component {
                   <option key={skill}>{skill}</option>
                 ))}
               </select>
-              <div className="click-icon" onClick={this.onClick.bind(this)}>
+              <div className="click-icon">
+                <div
+                  className="mySkills"
+                  style={{
+                    height: "100%",
+                    width: "100%",
+                    position: "absolute",
+                    zIndex: "2"
+                  }}
+                  onClick={this.onClick.bind(this)}
+                />
                 <i
                   className="fas fa-user-check"
                   style={{
-                    fontSize: "35px"
+                    fontSize: "35px",
+                    position: "absolute",
+                    zIndex: "1",
+                    marginLeft: "10px"
                   }}
                 />
               </div>
+              {this.props.myProfile.mySkills.length > 0 && (
+                <Table>
+                  <thead>
+                    <tr>
+                      <th>No.</th>
+                      <th>skills</th>
+                      <th>level</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {this.props.myProfile.mySkills.map(Skills => (
+                      <tr key={Skills.id}>
+                        <th key={Skills.no}>{Skills.no}</th>
+                        <td key={Skills.skill}>{Skills.skill}</td>
+                        <td key={Skills.level}>{Skills.level}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              )}
             </div>
             <div className="selectedSkills">
               <ul className="skills">
                 <li />
               </ul>
             </div>
-            <button>SAVE</button>
+            <button onClick={this.saveMyPofile}>SAVE</button>
           </form>
         </div>
         <div className="section-container">
@@ -367,10 +435,11 @@ class Profile extends Component {
 }
 
 const mapPropsToState = state => ({
-  myProfile: state.myProfile
+  myProfile: state.myProfile,
+  user: state.auth
 });
 
 export default connect(
   mapPropsToState,
-  { setCurrentProfile }
+  { setCurrentProfile, saveMyPofile }
 )(Profile);

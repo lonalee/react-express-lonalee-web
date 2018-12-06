@@ -1,15 +1,26 @@
 const initialState = {
   myHistory: [],
-  myAchievements: []
+  myAchievements: [],
+  mySkills: []
 };
 
 const myprofileReducer = (state = initialState, action) => {
   console.log("initialState, action", state, action);
   switch (action.type) {
-    case "TEST_SETCURRENTPROFILE":
+    case "SETPROFILE_HISTORY":
       return {
         ...state,
-        myHistory: [action.payload, ...state.myHistory]
+        [action.payload.ref]: [action.payload, ...state.myHistory]
+      };
+    case "SETPROFILE_ACHIEVEMENT":
+      return {
+        ...state,
+        [action.payload.ref]: [action.payload, ...state.myAchievements]
+      };
+    case "SETPROFILE_MYSKILLS":
+      return {
+        ...state,
+        [action.payload.ref]: [action.payload, ...state.mySkills]
       };
     default:
       return state;
