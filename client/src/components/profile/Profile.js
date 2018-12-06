@@ -2,6 +2,13 @@ import React, { Component } from "react";
 import Navbar from "../layout/Navbar";
 import Footer from "../layout/Footer";
 
+import { Table } from "reactstrap";
+
+import { setCurrentProfile } from "../../action/myProfileActions";
+import { connect } from "react-redux";
+
+import uuid from "uuid";
+
 class Profile extends Component {
   constructor() {
     super();
@@ -18,16 +25,37 @@ class Profile extends Component {
         "Mongoose"
       ],
       selected: [],
-      myHistory: [
-        {
-          history: "",
-          date: ""
-        }
-      ],
-      achievements: [],
+      // myHistory: [
+      //   {
+      //     id: uuid(),
+      //     history: "",
+      //     date: ""
+      //   }
+      // ],
+      currentHistory: {
+        no: 0
+      },
+      historyTouched: false,
+      achievementsTouched: false,
+      // myAchievements: [
+      //   {
+      //     id: uuid(),
+      //     achievements: "",
+      //     achievementDate: ""
+      //   }
+      // ],
       userInput: "",
-      userDate: ""
+      achievementsInput: "",
+      historyInput: "",
+      historyDateInput: "",
+      achievementsDateInput: ""
     };
+  }
+  componentDidMount() {
+    console.log("this.props", this.props);
+  }
+  componentWillReceiveProps(nextProps) {
+    console.log("nextProps", nextProps);
   }
 
   selectMySkill = e => {
@@ -37,24 +65,52 @@ class Profile extends Component {
 
   onChange(e) {
     this.setState({
-      userInput: e.target.value
+      ...this.state,
+      [e.target.name]: e.target.value
     });
   }
   onClick(e) {
-    this.setState({
-      myHistory: [
-        { history: this.state.userInput, date: this.state.userDate },
-        ...this.state.myHistory
-      ],
-      userInput: "",
-      userDate: ""
-    });
+    console.log(this.state);
+    console.log(e.target.className);
+    const currentData =
+      e.target.className === "myHistory"
+        ? {
+            no: this.state.currentHistory.no + 1,
+            id: uuid(),
+            history: this.state.historyInput,
+            historyDate: this.state.historyDateInput
+          }
+        : {
+            no: this.state.currentHistory.no + 1,
+            id: uuid(),
+            achievement: this.state.achievementsInput,
+            achievementDate: this.state.achievementsDateInput
+          };
+
+    this.props.setCurrentProfile(currentData);
+    // this.setState(state => ({
+    //   ...state,
+    //   historyInput: "",
+    //   historyDateInput: ""
+    // }));
+    if (e.target.className === "myHistory") {
+      this.setState(state => ({
+        ...state,
+        historyInput: "",
+        historyDateInput: ""
+      }));
+    } else
+      this.setState(state => ({
+        ...state,
+        achievementsInput: "",
+        achievementsDateInput: ""
+      }));
   }
 
   changeDate(e) {
     console.log(e.target.value);
     this.setState({
-      userDate: e.target.value
+      historyDateInput: e.target.value
     });
   }
 
@@ -101,7 +157,7 @@ class Profile extends Component {
             >
               <div className="col">
                 <label htmlFor="historyInput" className="history">
-                  <h4>My history</h4>
+                  <h4>학력 및 경력</h4>
                 </label>
                 <input
                   id="historyInput"
@@ -109,65 +165,92 @@ class Profile extends Component {
                   type="text"
                   className="history-input form-control"
                   onChange={this.onChange.bind(this)}
-                  value={this.state.userInput}
+                  value={this.state.historyInput}
                 />
-                {this.state.myHistory.map(history => (
-                  <div key={history.history}>
-                    {history.date && history.history}
-                  </div>
-                ))}
               </div>
               <div className="col">
                 <label htmlFor="date" className="date">
-                  <h4>When was it?</h4>
+                  <h4>기간</h4>
                 </label>
                 <input
                   id="date"
-                  type="date"
+                  placeholder="입력 예 : YY-MM-DD ~ YY-MM-DD"
+                  name="historyDateInput"
                   className="date-input form-control"
                   onChange={this.changeDate.bind(this)}
-                  value={this.state.userDate}
+                  value={this.state.historyDateInput}
                 />
-                {this.state.myHistory.map(history => (
-                  <div key={history.history}>
-                    {history.date && history.date}
-                  </div>
-                ))}
               </div>
-              <div className="click-icon" onClick={this.onClick.bind(this)}>
+              <div className="click-icon">
+                <div
+                  className="myHistory"
+                  style={{
+                    height: "100%",
+                    width: "100%",
+                    position: "absolute",
+                    zIndex: "2"
+                  }}
+                  onClick={this.onClick.bind(this)}
+                />
                 <i
                   className="fas fa-user-check"
                   style={{
-                    fontSize: "35px"
+                    fontSize: "35px",
+                    position: "absolute",
+                    zIndex: "1",
+                    marginLeft: "10px"
                   }}
                 />
               </div>
             </div>
+            {this.props.myProfile.myHistory.length > 0 && (
+              <Table>
+                <thead>
+                  <tr>
+                    <th>No.</th>
+                    <th>history</th>
+                    <th>period</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {this.props.myProfile.myHistory.map(history => (
+                    <tr key={history.id}>
+                      <th key={history.no}>{history.no}</th>
+                      <td key={history.history}>{history.history}</td>
+                      <td key={history.historyDate}>{history.historyDate}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            )}
+
             <div
               className="form-group form-row"
               style={{ width: "100%", marginLeft: "1px" }}
             >
               <div className="col">
                 <label htmlFor="">
-                  <h4>Achievements</h4>
+                  <h4>업적</h4>
                 </label>
                 <input
                   type="text"
+                  name="achievementsInput"
                   className="form-control"
                   onChange={this.onChange.bind(this)}
+                  value={this.state.achievementsInput}
                 />
               </div>
               <div className="col">
                 <label htmlFor="">
-                  <h4>When was it?</h4>
+                  <h4>기간</h4>
                 </label>
                 <input
+                  name="achievementsDateInput"
                   className="form-control date-input"
-                  type="date"
+                  placeholder="입력 예 : YY-MM-DD ~ YY-MM-DD"
                   onChange={this.onChange.bind(this)}
                 />
               </div>
-
               <div className="click-icon" onClick={this.onClick.bind(this)}>
                 <i
                   className="fas fa-user-check"
@@ -176,6 +259,18 @@ class Profile extends Component {
                   }}
                 />
               </div>
+              {this.state.achievementsTouched && (
+                <div>
+                  <ul>
+                    {this.state.myAchievements.map(hisObj => (
+                      <li key={hisObj.id}>
+                        {hisObj.achievements}
+                        {hisObj.achievementDate}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
             <div className="form-group">
               <label htmlFor="skill-set" className="skill-set">
@@ -271,4 +366,11 @@ class Profile extends Component {
   }
 }
 
-export default Profile;
+const mapPropsToState = state => ({
+  myProfile: state.myProfile
+});
+
+export default connect(
+  mapPropsToState,
+  { setCurrentProfile }
+)(Profile);

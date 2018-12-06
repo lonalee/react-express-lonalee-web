@@ -51,7 +51,10 @@ export default function(state = initialState, action) {
       return {
         ...state,
         isDeleted: !state.isDeleted,
-        deletedId: action.payload
+        deletedId: action.payload,
+        fetchedData: state.fetchedData.filter(
+          data => data.userid !== action.payload
+        )
       };
     default:
       return state;

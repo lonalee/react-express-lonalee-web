@@ -10,7 +10,18 @@ const Item = require("../../models/Item");
 router.get("/", (req, res) => {
   Item.find()
     .sort({ date: -1 }) // 내림차순
-    .then(items => res.json(items));
+    .then(items => {
+      // res.json(
+      //   items.map(obj => {
+      //     obj.content = obj.content.map(str => {
+      //       str = str + "\n".replace("\n", "\\r\\n");
+      //       return str;
+      //     });
+      //     return obj;
+      //   })
+      // );
+      res.json(items);
+    });
 }); // server.js 에서 /api/items로 router를 정의했음
 
 // @route POST api/items

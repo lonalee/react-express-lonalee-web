@@ -56,7 +56,7 @@ class ItemList extends Component {
       );
       this.setState({
         isFetched: nextProps.items.isFetched,
-        items: [...nextProps.items.fetchedData]
+        items: nextProps.items.fetchedData
       });
       console.log("componentWillReceiveProps this.state:::", this.state);
     }
@@ -100,7 +100,7 @@ class ItemList extends Component {
         heading,
         content: this.state.content
       };
-      newItem.content = newItem.content.split("\n");
+      // newItem.content = newItem.content.split("\n");
       this.props.postItem(newItem);
     }
     this.setState({ content: "" });
@@ -203,7 +203,7 @@ class ItemList extends Component {
   };
 
   render() {
-    const { items } = this.state; // 객체 deStructuring
+    const { items } = this.state; // 객체 deStructuring // fetchedData를 담고 있음
     console.log("when rendering", items);
     return (
       <Container className="list-Container">
@@ -318,18 +318,18 @@ class ItemList extends Component {
                             <ListGroupItemHeading>
                               {heading}
                             </ListGroupItemHeading>
-                            <ListGroupItemText>
-                              {Object.values(content).length === 1 && content}
-                            </ListGroupItemText>
+                            {/* {content.toString().split("\n")} */}
+                            {Object.values(content).map(t => {
+                              t = t.toString().split("\n");
+                              console.log(t);
+                              return t.map(text => (
+                                <ListGroupItemText key={text}>
+                                  {text}
+                                </ListGroupItemText>
+                              ));
+                            })}
                           </div>
                         )}
-                        {/* 사용자 입력값에 개행이 존재할 경우 처리 */}
-                        {!isUpdated &&
-                          typeof content !== "string" &&
-                          Object.values(content).length > 1 &&
-                          Object.values(content).map(t => (
-                            <ListGroupItemText>{t}</ListGroupItemText>
-                          ))}
                         {/* content는 객체화 되어 있어서 직접 map을 실행할 수 없다 */}
                         <button
                           className="update-btn btn-list"
@@ -338,14 +338,6 @@ class ItemList extends Component {
                         >
                           UPDATE
                         </button>
-
-                        {/* <button
-                          className="delete-btn btn-list"
-                          id={userid}
-                          onClick={this.delItem(userid)}
-                        >
-                          DELETE
-                        </button> */}
                         {isUpdated && (
                           <div>
                             <textarea
@@ -354,6 +346,7 @@ class ItemList extends Component {
                               className="textarea-update"
                               cols="30"
                               rows="10"
+                              style={{ width: "600px" }}
                             />
                             <button
                               id={userid}

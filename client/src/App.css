@@ -1,3 +1,11 @@
+/* ************************************The beginning of media quearies */
+
+@media only screen and (max-width: 1400px) {
+  aside {
+    display: none;
+  }
+}
+/* ************************************The end of media quearies */
 .landing h1 {
   font-family: "Oswald", sans-serif;
 }
